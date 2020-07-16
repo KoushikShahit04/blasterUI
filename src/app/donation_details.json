@@ -1,0 +1,22 @@
+[
+  {
+    "donorAadhar": "1348911245691354",
+    "donorName": "John Doe",
+    "bloodGroup": "B+",
+    "donationDate": "2020-06-21",
+    "donorStatus": "BLOCKED",
+    "donorMobileNumber": "+91 9875643158",
+    "donorEmail": "john.doe@email.com",
+    "donationStatus": "INITIAL"
+  },
+  {
+    "donorAadhar": "1547651234861597",
+    "donorName": "Jane Doe",
+    "bloodGroup": "A+",
+    "donationDate": "2020-06-21",
+    "donorStatus": "BLOCKED",
+    "donorMobileNumber": "+91 7564321896",
+    "donorEmail": "jane.doe@email.com",
+    "donationStatus": "INITIAL"
+  }
+]
