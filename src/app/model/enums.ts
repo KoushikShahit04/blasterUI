@@ -30,3 +30,8 @@ export enum DonorCategory {
   SILVER = "SILVER",
   BRONZE = "BRONZE",
 }
+
+export enum DonationRequestStatus {
+  REQUESTED = "REQUESTED",
+  DONATED = "DONATED",
+}
