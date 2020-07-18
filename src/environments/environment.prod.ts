@@ -9,5 +9,5 @@ export const environment = {
   INSTITUTE_DB: "institute_db"
   BLOCKCHAIN_DB: "blockchain_db",
   INST_ID: "I1234",
-  INST_NAME: "Apollo Hospital",
+  INST_NAME: "Apollo Hospital"
 };
