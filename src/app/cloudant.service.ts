@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { environment } from "../environments/environment";
 import { Observable } from "rxjs";
+import { BlockchainDonor } from "./model/blockchain.donor";
 
 @Injectable({
   providedIn: "root",
@@ -42,6 +43,22 @@ export class CloudantService {
     return this.http.post<HttpResponse<string>>(url, doc, this.httpOptions);
   }
 
+  findBlockchainDonor(
+    db: string,
+    donorId: string
+  ): Observable<HttpResponse<string>> {
+    console.log("Finding donor: " + donorId);
+    const url = `${environment.CLOUDANT_URL}/${db}/_find`;
+    console.log(url);
+    const body = { selector: { donorId: donorId } };
+    console.log("Request body: " + JSON.stringify(body));
+    return this.http.post<HttpResponse<string>>(
+      url,
+      JSON.stringify(body),
+      this.httpOptions
+    );
+  }
+
   /**
    * Get all documents from the cloudant db
    * @param db database name
@@ -74,7 +91,7 @@ export class CloudantService {
     doc: string
   ): Observable<HttpResponse<string>> {
     const url = `${environment.CLOUDANT_URL}/${db}/${docId}`;
-    return this.http.post<HttpResponse<string>>(url, doc, this.httpOptions);
+    return this.http.put<HttpResponse<string>>(url, doc, this.httpOptions);
   }
 
   /**

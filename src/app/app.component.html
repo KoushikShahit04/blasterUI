@@ -12,10 +12,11 @@
 </nav>
 
 <div class="container-fluid">
+  <h4 class="header text-center"> {{instituteName}} </h4>
   <div class="row">
     <div class="col-4 offset-1">
       <div class="mt-4">
-        <h4>Donations:</h4>
+        <h4>Donation Requests:</h4>
         <table class="table table-dark table-hover table-bordered" id="donationsTable"
           *ngIf="this.donors !== undefined">
           <caption>List of donations that need action</caption>
@@ -23,7 +24,7 @@
             <tr>
               <th id="donorName">Donor Name</th>
               <th id="bloodGroup">Blood Group</th>
-              <th id="donationStatus">Donation status</th>
+              <th id="requestStatus">Donation status</th>
             </tr>
           </thead>
           <tbody>
@@ -31,7 +32,7 @@
               (click)="selectDonor(donor)">
               <td>{{donor.donorName}}</td>
               <td>{{donor.bloodGroup}}</td>
-              <td>{{donor.donationDetails[0].bagStatus}}</td>
+              <td>{{donor.donationRequest.status}}</td>
             </tr>
           </tbody>
         </table>
@@ -40,7 +41,7 @@
       </div>
     </div>
     <div class="col-6 mt-4">
-      <h4>Donation Details:</h4>
+      <h4>Request Details:</h4>
       <div *ngIf="showDetails">
         <div class="card">
           <div class="card-header bg-primary text-center">
@@ -57,7 +58,7 @@
               <div class="col-2"> <label>Blood Group: </label> </div>
               <div class="col-4"> <span>{{selectedDonor.bloodGroup}}</span> </div>
               <div class="col-2"> <label>Donation Date: </label> </div>
-              <div class="col-4"> <span>{{selectedDonor.donationDetails[0].donationDate}}</span> </div>
+              <div class="col-4"> <span>{{selectedDonor.donationRequest.donationDate}}</span> </div>
             </div>
             <div class="row">
               <div class="col-2"> <label>Donor Status:</label> </div>
@@ -69,18 +70,39 @@
               <div class="col-2"> <label>Email Id: </label> </div>
               <div class="col-4"> <span>{{selectedDonor.donorEmail}}</span> </div>
               <div class="col-2"> <label>Donation Status: </label></div>
-              <div class="col-4"> <span>{{selectedDonor.donationDetails[0].bagStatus}}</span></div>
+              <div class="col-4"> <span>{{selectedDonor.donationRequest.status}}</span></div>
             </div>
           </div>
           <div class="card-footer bg-primary">
             <div class="float-right">
-              <button class="btn btn-success mr-2"
-                (click)="approve(selectedDonor.donationDetails[0].bagId)">Approve</button>
-              <button class="btn btn-warning" (click)="reject(selectedDonor.donationDetails[0].bagId)">Reject</button>
+              <button class="btn btn-success mr-2" (click)="open(collectModal)">Collect</button>
+              <button class="btn btn-warning" (click)="reject()">Reject</button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <ng-template #collectModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Collect Blood</h4>
+      <button type="button" class="btn btn-danger" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <label>
+        BagId:
+        <input type="text" [formControl]="bagId" required>
+        <span *ngIf="showRequired" class="text-warning">
+          Bag id is required.
+        </span>
+      </label>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="save()">Save</button>
+    </div>
+  </ng-template>
 </div>
