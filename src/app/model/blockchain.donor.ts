@@ -1,8 +1,7 @@
-import { Award } from "./donor.awards";
 import { BloodGroup, DonorCategory, DonorStatus } from "./enums";
-import { DonationRequest } from "./donation.request";
+import { Donation } from "./donation";
 
-export class Donor {
+export class BlockchainDonor {
   public _id: string;
   public _rev: string;
   public donorId: string;
@@ -11,8 +10,5 @@ export class Donor {
   public donorMobileNumber: string;
   public donorEmail: string;
   public donorStatus: DonorStatus;
-  public donorCategory: DonorCategory;
-  public rewardPoint: number;
-  public donationRequest: DonationRequest;
-  public donorAwards: Award[];
+  public donationDetails: Donation[];
 }
