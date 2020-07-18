@@ -7,9 +7,11 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { CloudantService } from "./cloudant.service";
 import { HttpClientModule } from "@angular/common/http";
+import { RequestComponent } from "./request/request.component";
+import { BloodbankComponent } from "./bloodbank/bloodbank.component";
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, RequestComponent, BloodbankComponent],
   imports: [
     BrowserModule,
     ReactiveFormsModule,

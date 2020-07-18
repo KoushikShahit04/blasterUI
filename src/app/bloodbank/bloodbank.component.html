@@ -1,0 +1,114 @@
+<div class="container-fluid">
+  <h4 class="header text-center"> {{instituteName}} </h4>
+  <div class="row" style="height: 500px;">
+    <div class="col-4 offset-1">
+      <div class="mt-4">
+        <h4>Available Blood Bags:</h4>
+        <table class="table table-dark table-hover table-bordered" id="donationsTable"
+          *ngIf="this.donors !== undefined">
+          <caption>List of donations that need action</caption>
+          <thead>
+            <tr>
+              <th id="donorName">Bag Id</th>
+              <th id="bloodGroup">Blood Group</th>
+              <th id="requestStatus">Bag status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let donor of donors">
+              <tr
+                *ngFor="let donation of donor.donationDetails | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize"
+                (click)="selectDonor(donor, donation.bagId)">
+                <td>{{donation.bagId}}</td>
+                <td>{{donor.bloodGroup}}</td>
+                <td>{{donation.bagStatus}}</td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+        <ngb-pagination [collectionSize]="noOfDonations" [(page)]="page" [maxSize]="5" [rotate]="true"
+          [ellipses]="false" [boundaryLinks]="true"></ngb-pagination>
+      </div>
+    </div>
+    <div class="col-6 mt-4">
+      <div *ngIf="showDetails">
+        <h4>Bag Details:</h4>
+        <div class="card">
+          <div class="card-header bg-primary text-center">
+            Donor Details & History
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-2"> <label>Bag Id:</label> </div>
+              <div class="col-4"> <span>{{selectedDonation.bagId}}</span> </div>
+              <div class="col-2"> <label>Donor Name: </label> </div>
+              <div class="col-4"> <span>{{selectedDonor.donorName}}</span> </div>
+            </div>
+            <div class="row">
+              <div class="col-2"> <label>Blood Group: </label> </div>
+              <div class="col-4"> <span>{{selectedDonor.bloodGroup}}</span> </div>
+              <div class="col-2"> <label>Donation Date: </label> </div>
+              <div class="col-4"> <span>{{selectedDonation.donationDate}}</span> </div>
+            </div>
+            <div class="row">
+              <div class="col-2"> <label>Donor Status:</label> </div>
+              <div class="col-4"> <span>{{selectedDonor.donorStatus}}</span> </div>
+              <div class="col-2"> <label>Mobile Number: </label> </div>
+              <div class="col-4"> <span>{{selectedDonor.donorMobileNumber}}</span> </div>
+            </div>
+            <div class="row">
+              <div class="col-2"> <label>Email Id: </label> </div>
+              <div class="col-4"> <span>{{selectedDonor.donorEmail}}</span> </div>
+              <div class="col-2"> <label>Bag Status: </label></div>
+              <div class="col-4">
+                <select [formControl]="bagStatus">
+                  <option *ngFor="let item of bagStatusList" [value]="item">{{item}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer bg-primary">
+            <div class="float-right">
+              <button class="btn btn-success mr-2" (click)="update()">Update</button>
+              <button class="btn btn-warning">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 100px;">
+    <div class="col-10 offset-1">
+      <div class="mt-4">
+        <h4>Available Blood Units:</h4>
+        <table class="table table-dark table-hover table-bordered" id="bloodGroupTable">
+          <caption>Available blood for each type</caption>
+          <thead>
+            <tr>
+              <th scope="col">A+</th>
+              <th scope="col">A-</th>
+              <th scope="col">B+</th>
+              <th scope="col">B-</th>
+              <th scope="col">AB+</th>
+              <th scope="col">AB-</th>
+              <th scope="col">O+</th>
+              <th scope="col">O-</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{bloodGroupMap.get("A+")}}</td>
+              <td>{{bloodGroupMap.get("A-")}}</td>
+              <td>{{bloodGroupMap.get("B+")}}</td>
+              <td>{{bloodGroupMap.get("B-")}}</td>
+              <td>{{bloodGroupMap.get("AB+")}}</td>
+              <td>{{bloodGroupMap.get("AB-")}}</td>
+              <td>{{bloodGroupMap.get("O+")}}</td>
+              <td>{{bloodGroupMap.get("O-")}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
