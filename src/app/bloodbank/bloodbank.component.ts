@@ -1,12 +1,10 @@
+import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
-import { CloudantService } from "../cloudant.service";
+import { FormControl } from "@angular/forms";
 import { environment } from "src/environments/environment";
-import { Donor } from "../model/donor";
-import { DonationRequestStatus, BagStatus } from "../model/enums";
 import { BlockchainDonor } from "../model/blockchain.donor";
-import { FormControl, Validators } from "@angular/forms";
 import { Donation } from "../model/donation";
-import { stringify } from "@angular/compiler/src/util";
+import { BagStatus } from "../model/enums";
 
 @Component({
   selector: "app-bloodbank",
@@ -20,7 +18,7 @@ export class BloodbankComponent implements OnInit {
   selectedDonation: Donation;
   showDetails: boolean = false;
   page = 1;
-  pageSize = 10;
+  pageSize = 5;
   noOfDonations = 0;
   bagStatusList: BagStatus[] = [
     BagStatus.COLLECTED,
@@ -33,35 +31,32 @@ export class BloodbankComponent implements OnInit {
   bagStatus: FormControl;
   bloodGroupMap: Map<string, number>;
 
-  constructor(private cloudantService: CloudantService) {}
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    this.selectedDonor = null;
+    this.donors = [];
     this.bloodGroupMap = new Map<string, number>();
-    this.cloudantService
-      .getDocs(environment.BLOCKCHAIN_DB)
-      .subscribe((response: any) => {
-        console.log(response.rows[0].doc);
-        this.noOfDonations = response.rows.length;
-        this.donors = [];
-
-        response.rows.forEach((row: any) => {
-          let donor = row.doc as BlockchainDonor;
-          if (donor != null) {
-            let donations = donor.donationDetails.filter(
-              (donation) =>
-                donation.bagStatus == BagStatus.COLLECTED ||
-                donation.bagStatus == BagStatus.TESTED ||
-                donation.bagStatus == BagStatus.APPROVED
-            );
-            if (donations != null && donations.length > 0) {
-              donor.donationDetails = donations;
-              this.donors.push(donor);
-              this.updateBloodGroupMap(donor, donations);
-            }
+    this.http.get("http://localhost:8888/redavatar/blockchain").subscribe(
+      (donors: BlockchainDonor[]) => {
+        donors.forEach((donor) => {
+          let donations = donor.donationDetails.filter(
+            (donation) =>
+              donation.bagStatus == BagStatus.COLLECTED ||
+              donation.bagStatus == BagStatus.TESTED ||
+              donation.bagStatus == BagStatus.APPROVED
+          );
+          if (donations != null && donations.length > 0) {
+            donor.donationDetails = donations;
+            this.donors.push(donor);
+            this.updateBloodGroupMap(donor, donations);
           }
         });
-        this.selectedDonor = null;
-      });
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
   }
 
   private updateBloodGroupMap(donor: BlockchainDonor, donations: Donation[]) {
@@ -84,16 +79,10 @@ export class BloodbankComponent implements OnInit {
 
   update() {
     this.selectedDonation.bagStatus = this.bagStatus.value;
-    this.cloudantService
-      .updateDoc(
-        environment.BLOCKCHAIN_DB,
-        this.selectedDonor._id,
-        JSON.stringify(this.selectedDonor)
-      )
-      .subscribe((response: any) => {
-        console.log("Updated Blood bag status: " + JSON.stringify(response));
-        this.selectedDonor._id = response.id;
-        this.selectedDonor._rev = response.rev;
+    this.http
+      .post("http://localhost:8888/redavatar/blockchain", this.selectedDonor)
+      .subscribe((result) => {
+        console.log("Updated Blood bag status: " + JSON.stringify(result));
       });
   }
 }

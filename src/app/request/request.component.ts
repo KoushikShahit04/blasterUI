@@ -1,12 +1,13 @@
+import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
-import { Donor } from "../model/donor";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { NgbModal, NgbModalRef } from "@ng-bootstrap/ng-bootstrap";
 import { environment } from "src/environments/environment";
-import { NgbModalRef, NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { CloudantService } from "../cloudant.service";
-import { DonationRequestStatus, BagStatus, BloodGroup } from "../model/enums";
 import { BlockchainDonor } from "../model/blockchain.donor";
 import { Donation } from "../model/donation";
+import { Donor } from "../model/donor";
+import { BagStatus, DonationRequestStatus } from "../model/enums";
 
 @Component({
   selector: "app-request",
@@ -20,10 +21,9 @@ export class RequestComponent implements OnInit {
   selectedDonor: Donor;
   donorDetailsForm: FormGroup;
   showDetails: boolean = false;
-  instituteName: string = environment.INST_NAME;
 
   page = 1;
-  pageSize = 10;
+  pageSize = 5;
   noOfDonations = 0;
   modalRef: NgbModalRef;
 
@@ -50,7 +50,8 @@ export class RequestComponent implements OnInit {
 
   constructor(
     private cloudantService: CloudantService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private http: HttpClient
   ) {
     this.cloudantService
       .getDocs(environment.BLASTER_DB)
@@ -78,100 +79,6 @@ export class RequestComponent implements OnInit {
     });
   }
 
-  save() {
-    if (this.bagId.valid) {
-      this.showRequired = false;
-      this.cloudantService
-        .findBlockchainDonor(
-          environment.BLOCKCHAIN_DB,
-          this.selectedDonor.donorId
-        )
-        .subscribe((response: any) => {
-          var blockDonor: BlockchainDonor = this.getOrCreateDonor(response);
-
-          blockDonor.donationDetails.push(
-            new Donation(
-              this.bagId.value,
-              this.selectedDonor.donationRequest.donationDate,
-              BagStatus.COLLECTED,
-              this.selectedDonor.donationRequest.donationCenter
-            )
-          );
-          this.selectedDonor.donationRequest.status =
-            DonationRequestStatus.DONATED;
-
-          this.updateBlockchainDB(blockDonor);
-          this.updateBlasterDB();
-        });
-      this.modalRef.close();
-    } else {
-      this.showRequired = true;
-    }
-  }
-
-  private updateBlasterDB() {
-    this.cloudantService
-      .updateDoc(
-        environment.BLASTER_DB,
-        this.selectedDonor._id,
-        JSON.stringify(this.selectedDonor)
-      )
-      .subscribe((response: any) => {
-        console.log("Blaster DB Update: " + JSON.stringify(response));
-      });
-  }
-
-  private updateBlockchainDB(blockDonor: BlockchainDonor) {
-    this.cloudantService
-      .updateDoc(
-        environment.BLOCKCHAIN_DB,
-        blockDonor._id,
-        JSON.stringify(blockDonor)
-      )
-      .subscribe((response: any) => {
-        console.log("Update response: " + JSON.stringify(response));
-      });
-  }
-
-  private getOrCreateDonor(response: any): BlockchainDonor {
-    var blockDonor = new BlockchainDonor();
-    if (!response.docs || (response.docs as []).length == 0) {
-      console.log("Document not present in blockchain");
-      blockDonor.bloodGroup = this.selectedDonor.bloodGroup;
-      blockDonor.donationDetails = [];
-      blockDonor.donorEmail = this.selectedDonor.donorEmail;
-      blockDonor.donorId = this.selectedDonor.donorId;
-      blockDonor.donorMobileNumber = this.selectedDonor.donorMobileNumber;
-      blockDonor.donorName = this.selectedDonor.donorName;
-      blockDonor.donorStatus = this.selectedDonor.donorStatus;
-
-      this.cloudantService
-        .createDoc(environment.BLOCKCHAIN_DB, JSON.stringify(blockDonor))
-        .subscribe((response: any) => {
-          blockDonor._id = response.id;
-          blockDonor._rev = response.rev;
-        });
-    } else {
-      blockDonor = response.docs[0];
-    }
-    return blockDonor;
-  }
-
-  selectDonor(donor: Donor) {
-    this.selectedDonor = donor;
-    this.showDetails = true;
-  }
-
-  collect() {
-    this.selectedDonor.donationRequest.status = DonationRequestStatus.DONATED;
-    console.log("Updated donation: " + JSON.stringify(this.selectedDonor));
-  }
-
-  reject() {
-    this.selectedDonor.donationRequest.status = DonationRequestStatus.REQUESTED;
-    console.log("Updated donation: " + JSON.stringify(this.selectedDonor));
-  }
-
   addBloodBag() {
     if (this.addBloodForm.valid) {
       let formValue = this.addBloodForm.value;
@@ -181,23 +88,15 @@ export class RequestComponent implements OnInit {
         formValue.bagStatus,
         formValue.collectedAt
       );
-      this.cloudantService
-        .findBlockchainDonor(environment.BLOCKCHAIN_DB, formValue.donorId)
-        .subscribe((response: any) => {
-          if (response.docs && (response.docs as []).length > 0) {
-            let donor = response.docs[0] as BlockchainDonor;
-            donor.donationDetails.push(newDonation);
-            this.cloudantService
-              .updateDoc(
-                environment.BLOCKCHAIN_DB,
-                donor._id,
-                JSON.stringify(donor)
-              )
-              .subscribe((response: any) => {
-                console.log("Donation details added");
-                alert("Donation details added");
-              });
-          }
+      this.http
+        .get("http://localhost:8888/redavatar/blockchain/" + formValue.donorId)
+        .subscribe((result: BlockchainDonor) => {
+          result.donationDetails.push(newDonation);
+          this.http
+            .post("http://localhost:8888/redavatar/blockchain/", result)
+            .subscribe((result) => {
+              console.log("Updated blockchain: " + result);
+            });
         });
     }
   }

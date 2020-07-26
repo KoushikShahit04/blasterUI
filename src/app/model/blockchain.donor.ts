@@ -1,9 +1,7 @@
-import { BloodGroup, DonorCategory, DonorStatus } from "./enums";
 import { Donation } from "./donation";
+import { BloodGroup, DonorStatus } from "./enums";
 
 export class BlockchainDonor {
-  public _id: string;
-  public _rev: string;
   public donorId: string;
   public donorName: string;
   public bloodGroup: BloodGroup;

@@ -1,0 +1,40 @@
+<p>alerts works!</p>
+<div class="container">
+  <div class="row">
+    <div class="col-4 offset-4">
+      <div class="card bg-dark" style="color: white; width: auto;">
+        <div class="card-header">
+          <h4>Send SMS alerts</h4>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="alertForm">
+            <div class="form-row">
+              <div class="form-group col-12">
+                <label for="donorId">DonorId</label>
+                <input id="donorId" name="donorId" class="form-control" type="text" formControlName="donorId">
+                <div *ngIf="donorId.invalid && donorId.touched" class="alert alert-danger">
+                  Donor Id is required
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-12">
+                <label for="messageText">Message</label>
+                <textarea id="messageText" class="form-control" rows="3" formControlName="messageText"
+                  required></textarea>
+                <div *ngIf="messageText.invalid && messageText.touched" class="alert alert-danger">
+                  Message text is required
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="card-footer">
+          <div class="float-right">
+            <button class="btn btn-primary" type="button" (click)="sendMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

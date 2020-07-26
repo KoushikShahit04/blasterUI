@@ -1,1 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Bitter&display=swap");
+/* Font Family */
+html,
+body {
+  font-family: "Bitter", serif;
+}
+
+.tableHeaderFont {
+  font-weight: bolder;
+  text-shadow: 2px 7px 5px rgba(0, 0, 0, 0.3),
+    0px -4px 10px rgba(255, 255, 255, 0.3);
+}

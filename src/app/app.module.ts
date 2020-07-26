@@ -9,9 +9,17 @@ import { CloudantService } from "./cloudant.service";
 import { HttpClientModule } from "@angular/common/http";
 import { RequestComponent } from "./request/request.component";
 import { BloodbankComponent } from "./bloodbank/bloodbank.component";
+import { ViewRequestsComponent } from "./view-requests/view-requests.component";
+import { AlertsComponent } from './alerts/alerts.component';
 
 @NgModule({
-  declarations: [AppComponent, RequestComponent, BloodbankComponent],
+  declarations: [
+    AppComponent,
+    RequestComponent,
+    BloodbankComponent,
+    ViewRequestsComponent,
+    AlertsComponent,
+  ],
   imports: [
     BrowserModule,
     ReactiveFormsModule,
